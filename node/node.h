@@ -71,5 +71,4 @@ public:
     }
 };
 
-
 #endif //SOLVER_RVMOSQUERA_NODE_H

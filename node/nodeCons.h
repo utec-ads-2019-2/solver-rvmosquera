@@ -22,5 +22,4 @@ public:
 
 };
 
-
 #endif //SOLVER_RVMOSQUERA_NODECONS_H

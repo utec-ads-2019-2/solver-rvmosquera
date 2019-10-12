@@ -22,7 +22,6 @@ using namespace std;
 #endif
 
 class Tester {
-
     public:
         static void execute_test1();
         static void execute_test2();
