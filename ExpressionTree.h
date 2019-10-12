@@ -36,7 +36,6 @@ public:
         auto stack2 = new stack<node *>();
         string numberStr;
         string alphaStr;
-        //auto len = infixExp.length();
 
         variables = new vector<nodeVar*>();
 
@@ -114,7 +113,6 @@ public:
                 variables->push_back(nodevariable);
             }
 
-            //cout << *alphaStr << endl;
             *alphaStr = "";
         }
     }
