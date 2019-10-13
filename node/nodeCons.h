@@ -16,7 +16,7 @@ public:
         type = 'C';
     };
 
-    tipoDato execute() override {
+    retDataType execute() override {
         return this->dataNumber;
     }
 

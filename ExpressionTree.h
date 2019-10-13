@@ -20,12 +20,11 @@ private:
     node *root;
     stack<node *> *postFix;
     vector<nodeVar *> *variables;
-    int cantSigns;
+    node * prevNode;
 public:
     ExpressTree() {
         root = nullptr;
         postFix = new stack<node *>();
-        cantSigns = 1;
     }
 
     float evaluate() {
@@ -34,36 +33,78 @@ public:
 
     void generateFromInfixExp(string infixExp) {
         auto stack2 = new stack<node *>();
+        node *newNode = nullptr;
         string numberStr;
         string alphaStr;
+        int sum_sub=0;
 
-        variables = new vector<nodeVar*>();
-
-//        for (int i = 0; i < len; i++) {
-        for( auto it = infixExp.begin(); it != infixExp.end(); ++it) {
-            auto character = *it; //infixExp[i];
+        variables = new vector<nodeVar *>();
+        prevNode = nullptr;
+        for (auto it = infixExp.begin(); it != infixExp.end(); ++it) {
+            auto character = *it;
 
             if (isdigit(character)) {
                 numberStr = numberStr + character;
+
             } else if (isalpha(character)) {
                 alphaStr = alphaStr + character;
+
+            /*} else if ( character == '+' ) {
+
+                if ( prevNode->getType() == '+' || prevNode->getType() == '-' )
+                    sum_sub = sum_sub * 1;
+                else
+                    sum_sub = 1;
+
+            } else if ( character == '-' ) {
+
+                if ( prevNode->getType() == '+' || prevNode->getType() == '-' )
+                    sum_sub = sum_sub * -1;
+                else
+                    sum_sub = -1;*/
+
             } else {
                 if (numberStr != "") {
-                    postFix->push(new nodeCons(numberStr));
+                    newNode = new nodeCons(numberStr);
+                    postFix->push(newNode);
                     numberStr = "";
+
+                    prevNode = newNode;
                 }
+
                 getVariable(&alphaStr);
+
+                /*if ( sum_sub < 0 ) {
+                    newNode = new nodeSubOpe(string(1, '-'));
+
+                    validatePrecedence(stack2, newNode);
+                    prevNode = newNode;
+                    sum_sub = 0;
+                    continue;
+
+                } else if (sum_sub > 0 ) {
+                    newNode = new nodeSumOpe(string(1, '+'));
+
+                    validatePrecedence(stack2, newNode);
+                    prevNode = newNode;
+                    sum_sub = 0;
+                    continue;
+                }*/
 
                 switch (character) {
                     case ' ':
                         continue;
                     case '(': {
-                        stack2->push(new nodeParenth(string(1, character) ));
+                        newNode = new nodeParenth(string(1, character));
+                        stack2->push(newNode);
+                        prevNode = newNode;
                     }
                         break;
 
                     case ')': {
                         auto node = stack2->top();
+                        newNode = new nodeParenth(string(1, character));
+
                         while (node->getType() != '(') {
                             postFix->push(node);
                             stack2->pop();
@@ -72,15 +113,19 @@ public:
 
                         if (node->getType() == '(')
                             stack2->pop();
+
+                        prevNode = newNode;
                     }
                         break;
                     default: { // is operator
-                        moveOperators(stack2, character);
+                        newNode = moveOperators(character);
+                        validatePrecedence(stack2, newNode);
+
+                        prevNode = newNode;
                     }
                 }
             }
 
-            //if (i == len - 1) {
             if (it == infixExp.end() - 1) {
                 if (numberStr != "")
                     postFix->push(new nodeCons(numberStr));
@@ -108,9 +153,9 @@ public:
             if (exists != variables->end()) {
                 postFix->push(*exists);
             } else {
-                auto nodevariable = new nodeVar(*alphaStr);
-                postFix->push(nodevariable);
-                variables->push_back(nodevariable);
+                auto pNodeVar = new nodeVar(*alphaStr);
+                postFix->push(pNodeVar);
+                variables->push_back(pNodeVar);
             }
 
             *alphaStr = "";
@@ -148,10 +193,10 @@ public:
 
     void askvalueVariables() {
         int value;
-        for(auto elem: *variables) {
-            cout << "Value for variable " <<elem->getData()<<" = ";
+        for (auto elem: *variables) {
+            cout << "Value for variable " << elem->getData() << " = ";
             cin >> value;
-            elem->setValue( value );
+            elem->setValue(value);
         }
     }
 
@@ -163,7 +208,7 @@ public:
         }
     }
 
-    void moveOperators(stack<node *> *aux, char character) {
+    node *moveOperators( char character) {
         node *newNode = nullptr;
         switch (character) {
             case '^':
@@ -179,19 +224,22 @@ public:
                 break;
             case '+': {
                 newNode = new nodeSumOpe(string(1, character));
-                //cantSigns = cantSigns * 1;
             }
                 break;
             case '-': {
                 newNode = new nodeSubOpe(string(1, character));
-                //cantSigns = cantSigns * -1;
             }
                 break;
         }
 
+        return newNode;
+    }
+
+    void validatePrecedence(stack<node *> *aux, node *newNode) const {
         if (aux->empty())
             aux->push(newNode);
         else {
+//          Validate operators precedence
             if (newNode->getPrecedence() > aux->top()->getPrecedence()) {
                 aux->push(newNode);
             } else if (newNode->getPrecedence() < aux->top()->getPrecedence()) {

@@ -12,7 +12,7 @@
 #include <math.h>
 #include <vector>
 
-typedef float tipoDato;
+typedef float retDataType;
 
 using namespace std;
 
@@ -27,7 +27,7 @@ protected:
 public:
     node(string data) : data(data) {};
 
-    virtual tipoDato execute() = 0;
+    virtual retDataType execute() = 0;
 
     const string &getData() const {
         return data;

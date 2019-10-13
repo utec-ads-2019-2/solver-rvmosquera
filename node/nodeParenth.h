@@ -15,7 +15,7 @@ public:
         type = '(';
     };
 
-    tipoDato execute() override {
+    retDataType execute() override {
 
         return 0;
     }

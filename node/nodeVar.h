@@ -21,7 +21,7 @@ public:
         nodeVar::value = value;
     }
 
-    tipoDato execute() override {
+    retDataType execute() override {
 
         return value;
     }

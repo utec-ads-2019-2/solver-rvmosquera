@@ -16,7 +16,7 @@ public:
         type = '+';
     };
 
-    tipoDato execute() override {
+    retDataType execute() override {
         auto a = getLeft()->execute();
         auto b = getRight()->execute();
 
