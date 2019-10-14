@@ -46,24 +46,15 @@ public:
             if (isdigit(character)) {
                 numberStr = numberStr + character;
 
+                prevNode = validate_sum_sub_operators(stack2, &sum_sub);
+
             } else if (isalpha(character)) {
                 alphaStr = alphaStr + character;
 
-            /*} else if ( character == '+' ) {
+                prevNode = validate_sum_sub_operators(stack2, &sum_sub);
 
-                if ( prevNode->getType() == '+' || prevNode->getType() == '-' )
-                    sum_sub = sum_sub * 1;
-                else
-                    sum_sub = 1;
+            } else if ( character == '+' ) {
 
-            } else if ( character == '-' ) {
-
-                if ( prevNode->getType() == '+' || prevNode->getType() == '-' )
-                    sum_sub = sum_sub * -1;
-                else
-                    sum_sub = -1;*/
-
-            } else {
                 if (numberStr != "") {
                     newNode = new nodeCons(numberStr);
                     postFix->push(newNode);
@@ -74,27 +65,59 @@ public:
 
                 getVariable(&alphaStr);
 
-                /*if ( sum_sub < 0 ) {
-                    newNode = new nodeSubOpe(string(1, '-'));
+                if ( prevNode->getType() == '+' || prevNode->getType() == '-' )
+                    sum_sub = sum_sub * 1;
+                else
+                    sum_sub = 1;
 
-                    validatePrecedence(stack2, newNode);
+                prevNode = new nodeSumOpe(string(1, '+'));
+
+            } else if ( character == '-' ) {
+                auto it2 = it;
+
+                if (numberStr != "") {
+                    newNode = new nodeCons(numberStr);
+                    postFix->push(newNode);
+                    numberStr = "";
+
                     prevNode = newNode;
+                }
+
+                getVariable(&alphaStr);
+
+                if ( prevNode->getType() == '+' || prevNode->getType() == '-' )
+                    sum_sub = sum_sub * -1;
+                else
+                    sum_sub = -1;
+                //is unary?
+                it2++;
+                auto prevOperator = prevNode->getType();
+                if( ( isdigit(*it2) && prevNode->isOperator1() && prevOperator != '+'
+                  && prevOperator != '-' ) || ( isdigit(*it2) && prevOperator == '(' ) ) {
                     sum_sub = 0;
-                    continue;
+                    numberStr = '-';
+                }
 
-                } else if (sum_sub > 0 ) {
-                    newNode = new nodeSumOpe(string(1, '+'));
+                prevNode = new nodeSubOpe(string(1, '-'));
 
-                    validatePrecedence(stack2, newNode);
+            } else {
+
+                if (numberStr != "") {
+                    newNode = new nodeCons(numberStr);
+                    postFix->push(newNode);
+                    numberStr = "";
+
                     prevNode = newNode;
-                    sum_sub = 0;
-                    continue;
-                }*/
+                }
+
+                getVariable(&alphaStr);
 
                 switch (character) {
                     case ' ':
                         continue;
                     case '(': {
+                        prevNode = validate_sum_sub_operators(stack2, &sum_sub);
+
                         newNode = new nodeParenth(string(1, character));
                         stack2->push(newNode);
                         prevNode = newNode;
@@ -139,6 +162,30 @@ public:
             }
         }
         buildTree();
+    }
+
+    node * validate_sum_sub_operators(stack<node *> *stack, int *sum_sub) {
+        node* newNode;
+
+        if ( *sum_sub < 0 ) {
+            newNode = new nodeSubOpe(string(1, '-'));
+
+            validatePrecedence(stack, newNode);
+            prevNode = newNode;
+            *sum_sub = 0;
+
+        } else if (*sum_sub > 0 ) {
+            newNode = new nodeSumOpe(string(1, '+'));
+
+            validatePrecedence(stack, newNode);
+            prevNode = newNode;
+            *sum_sub = 0;
+        }
+
+        if (newNode)
+            return newNode;
+        else
+            return prevNode;
     }
 
     void getVariable(string *alphaStr) const {
