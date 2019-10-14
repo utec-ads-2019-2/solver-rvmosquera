@@ -5,7 +5,7 @@
 ![](class.png)
  
 ## Resultados
-> Las pruebas se realizan invocando al método execute_test1 de la clase Tester.
+> Las pruebas se realizan invocando a los métodos execute_test1 y execute_test2 de la clase Tester.
 ```cpp
 int main(int argc, char *argv[]) {
 
